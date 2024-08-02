@@ -31,7 +31,7 @@ function saveOptions() {
 function restoreOptions() {
   chrome.storage.sync.get(
     {
-      apiUrl: "https://localhost:11434/v1/completions",
+      apiUrl: "http://localhost:11434/v1/chat/completions",
       authKey: "",
       model: "phi3",
       blacklist: [],

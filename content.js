@@ -82,18 +82,20 @@ document.addEventListener("input", (e) => {
   const cursorPosition = inputElement.selectionStart;
   const inputValue = inputElement.value;
 
-  chrome.runtime.sendMessage(
-    {
-      action: "getAutocomplete",
-      text: inputValue.substring(0, cursorPosition),
-    },
-    (response) => {
-      if (response.suggestion) {
-        currentSuggestion = response.suggestion;
-        showSuggestion(inputElement, cursorPosition, currentSuggestion);
-      }
-    },
-  );
+  if (inputValue.length % 10 == 0 && inputValue.length > 0) {
+    chrome.runtime.sendMessage(
+      {
+        action: "getAutocomplete",
+        text: inputValue.substring(0, cursorPosition),
+      },
+      (response) => {
+        if (response.suggestion) {
+          currentSuggestion = response.suggestion;
+          showSuggestion(inputElement, cursorPosition, currentSuggestion);
+        }
+      },
+    );
+  }
 });
 
 document.addEventListener("keydown", (e) => {

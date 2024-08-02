@@ -1,6 +1,6 @@
 // background.js
 let config = {
-  apiUrl: "https://localhost:11434/v1/completions",
+  apiUrl: "http://localhost:11434/v1/chat/completions",
   authKey: "",
   model: "phi3",
   blacklist: [],
@@ -53,18 +53,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "localhost",
         Authorization: `Bearer ${config.authKey}`,
       },
       body: JSON.stringify({
         model: config.model,
-        prompt: request.text,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert autocomplete system. Suggest How to complete the provided text",
+          },
+          { role: "user", content: "request.text" },
+        ],
         max_tokens: 50,
         n: 1,
         stop: null,
         temperature: 0.7,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response);
+        response.json();
+      })
       .then((data) => {
         if (data.choices && data.choices.length > 0) {
           sendResponse({ suggestion: data.choices[0].text.trim() });
