@@ -3,11 +3,7 @@
   "name": "Local API Autocomplete",
   "version": "1.0",
   "description": "Uses a local or remote API for autocomplete suggestions",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "<all_urls>"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
@@ -24,5 +20,10 @@
   },
   "browser_action": {
     "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "autocomplete@example.com"
+    }
   }
 }
