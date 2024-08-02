@@ -71,13 +71,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         temperature: 0.7,
       }),
     })
-      .then((response) => {
-        console.log(response);
-        response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         if (data.choices && data.choices.length > 0) {
-          sendResponse({ suggestion: data.choices[0].text.trim() });
+          sendResponse({ suggestion: data.choices[0].message.content.trim() });
         } else {
           sendResponse({ error: "No suggestion received" });
         }
