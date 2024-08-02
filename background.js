@@ -53,7 +53,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "localhost",
         Authorization: `Bearer ${config.authKey}`,
       },
       body: JSON.stringify({
@@ -64,11 +63,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             content:
               "You are an expert autocomplete system. Suggest How to complete the provided text",
           },
-          { role: "user", content: "request.text" },
+          { role: "user", content: request.text },
         ],
         max_tokens: 50,
-        n: 1,
-        stop: null,
+        // n: 1,
+        // stop: null,
         temperature: 0.7,
       }),
     })
