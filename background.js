@@ -1,11 +1,12 @@
 // background.js
 let config = {
-  apiUrl: 'http://localhost:11434/api/generate',
+  apiUrl: 'https://api.openai.com/v1/completions',
   authKey: '',
+  model: 'gpt-3.5-turbo-instruct',
   blacklist: []
 };
 
-chrome.storage.sync.get(['apiUrl', 'authKey', 'blacklist'], function(items) {
+chrome.storage.sync.get(['apiUrl', 'authKey', 'model', 'blacklist'], function(items) {
   config = { ...config, ...items };
 });
 
@@ -27,50 +28,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": config.authKey ? `Bearer ${config.authKey}` : ''
+        "Authorization": `Bearer ${config.authKey}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: config.model,
         prompt: request.text,
-        max_tokens: 50
+        max_tokens: 50,
+        n: 1,
+        stop: null,
+        temperature: 0.7
       }),
     })
     .then(response => response.json())
     .then(data => {
-      sendResponse({suggestion: data.response});
+      if (data.choices && data.choices.length > 0) {
+        sendResponse({suggestion: data.choices[0].text.trim()});
+      } else {
+        sendResponse({error: "No suggestion received"});
+      }
     })
     .catch(error => {
       console.error("Error:", error);
       sendResponse({error: "Failed to get autocomplete suggestion"});
     });
     return true;
+  } else if (request.action === "checkBlacklist") {
+    const isBlacklisted = config.blacklist.some(blacklistedUrl => request.url.includes(blacklistedUrl));
+    sendResponse({isBlacklisted: isBlacklisted});
+    return true;
   }
 });
-
-
-/*
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getAutocomplete") {
-    fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        prompt: request.text,
-        max_tokens: 50
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      sendResponse({suggestion: data.response});
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      sendResponse({error: "Failed to get autocomplete suggestion"});
-    });
-    return true; // Keeps the message channel open for async response
-  }
-});
-*/
